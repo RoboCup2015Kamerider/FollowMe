@@ -10,11 +10,6 @@
 
 using namespace std;
 
-double _dotProductXZ(Vector3d &v3d_v1, Vector3d &v3d_v2)
-{
-	return v3d_v1.x() * v3d_v2.x() + v3d_v1.z() * v3d_v2.z();
-}
-
 class MyController : public Controller 
 {  
 public:  
@@ -56,30 +51,12 @@ public:
 		m_pRO_robot->setWheelVelocity(-PI / 4, PI / 4);
 		sleep(1.0);
 		m_pRO_robot->setWheelVelocity(0, 0);
-		Vector3d v3d_oldDir = m_v3d_robotDir;
-		m_v3d_robotDir.x(v3d_oldDir.z());
-		m_v3d_robotDir.z(-v3d_oldDir.x());
-		cout << "turn left" << endl;
 	}
 	void turnRight()
 	{
 		m_pRO_robot->setWheelVelocity(PI / 4, -PI / 4);
 		sleep(1.0);
 		m_pRO_robot->setWheelVelocity(0, 0);
-		Vector3d v3d_oldDir = m_v3d_robotDir;
-		m_v3d_robotDir.x(-v3d_oldDir.z());
-		m_v3d_robotDir.z(v3d_oldDir.x());
-		cout << "turn right" << endl;
-	}
-	void turnBack()
-	{
-		m_pRO_robot->setWheelVelocity(PI / 2, -PI / 2);
-		sleep(1.0);
-		m_pRO_robot->setWheelVelocity(0, 0);
-		Vector3d v3d_oldDir = m_v3d_robotDir;
-		m_v3d_robotDir.x(-v3d_oldDir.x());
-		m_v3d_robotDir.z(-v3d_oldDir.z());
-		cout << "turn back" << endl;
 	}
 };  
   
@@ -169,43 +146,30 @@ double MyController::onAction(ActionEvent &evt)
 		
 		Vector3d v3d_robotdiff;
 		
-		double d_angleWorld = v3d_diff.x() / sqrt(pow(v3d_diff.x(), 2) + pow(v3d_diff.z(), 2));
+		if(m_v3d_robotDir.x() == 0 && m_v3d_robotDir.z() == 1)
+		{
+			v3d_robotdiff.x(v3d_diff.x());
+			v3d_robotdiff.z(v3d_diff.z());
+		}
+		else if(m_v3d_robotDir.x() == -1 && m_v3d_robotDir.z() == 0)
+		{
+			v3d_robotdiff.x(v3d_diff.z());
+			v3d_robotdiff.z(-v3d_diff.x());
+		}
+		else if(m_v3d_robotDir.x() == 0 && m_v3d_robotDir.z() == -1)
+		{
+			v3d_robotdiff.x(v3d_diff.x());
+			v3d_robotdiff.z(-v3d_diff.z());
+		}
+		else if(m_v3d_robotDir.x() == 1 && m_v3d_robotDir.z() == 0)
+		{
+			v3d_robotdiff.x(v3d_diff.z());
+			v3d_robotdiff.z(v3d_diff.x());
+		}
 		
-		double d_angleRobot = m_v3d_robotDir.x() / sqrt(pow(m_v3d_robotDir.x(), 2) + pow(m_v3d_robotDir.z(), 2));
+		cout << v3d_diff.x() << "\t" << v3d_diff.z() << endl;
+		cout << m_v3d_robotDir.x() << "\t" << m_v3d_robotDir.z() << endl;
 		
-		double d_angleDiff = (v3d_diff.x() * m_v3d_robotDir.x() + v3d_diff.z() * m_v3d_robotDir.z()) / sqrt(pow(v3d_diff.x(), 2) + pow(v3d_diff.z(), 2));
-		double d_arcAngleDiff = acos(d_angleDiff);
-		
-#ifdef __DEBUG		
-		cout << v3d_diff.x() << "\t" << v3d_diff.z() << "\t" << d_angleWorld << "\t" <<  m_v3d_robotDir.x() << "\t" << m_v3d_robotDir.z() << "\t" << d_angleRobot << "\t" << d_angleDiff << "\t" << d_arcAngleDiff << endl;
-#endif		
-		// 检测夹角
-		if(fabs(d_arcAngleDiff - 0) < 0.2)
-		{
-			// same direction
-			cout << "in<0.2#";
-			v3d_robotdiff.z(_dotProductXZ(v3d_diff, m_v3d_robotDir));
-		}
-		else if(_dotProductXZ(v3d_diff, m_v3d_robotDir) > 2)
-		{
-			cout << "in>0.1#";
-			v3d_robotdiff.z(_dotProductXZ(v3d_diff, m_v3d_robotDir));
-		}
-		else if(fabs(d_arcAngleDiff - PI / 2) < 0.2)
-		{
-			turnRight();
-			return 1.0;
-		}
-		else if(fabs(d_arcAngleDiff + PI / 2) < 0.2)
-		{
-			turnLeft();
-			return 1.0;
-		}
-		else if(fabs(d_arcAngleDiff - PI) < 0.2)
-		{
-			turnBack();
-			return 1.0;
-		}
 		
 		double d_wheelVelocity;
 		if(v3d_robotdiff.z() > 20)
@@ -216,7 +180,22 @@ double MyController::onAction(ActionEvent &evt)
 		{
 			d_wheelVelocity = v3d_robotdiff.z() / 10;
 		}
-
+		else if(v3d_robotdiff.x() > 20)
+		{
+			turnLeft();
+			Vector3d v3d_oldDir = m_v3d_robotDir;
+			m_v3d_robotDir.x(v3d_oldDir.z());
+			m_v3d_robotDir.z(-v3d_oldDir.x());
+			return 1.0;
+		}
+		else if(v3d_robotdiff.x() < -20)
+		{
+			turnRight();
+			Vector3d v3d_oldDir = m_v3d_robotDir;
+			m_v3d_robotDir.x(-v3d_oldDir.z());
+			m_v3d_robotDir.z(v3d_oldDir.x());
+			return 1.0;
+		}
 		m_pRO_robot->setWheelVelocity(d_wheelVelocity, d_wheelVelocity);
 		
 		i_pathIndex++;
