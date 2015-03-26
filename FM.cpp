@@ -7,8 +7,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#define PI 3.1415926
-#define TIMEOUT 0.2
+#define PI 3.1415926535797
+#define TIMEOUT 0.5
 
 #define __DEBUG
 
@@ -42,6 +42,8 @@ public:
 	Vector3d m_v3d_robotPos;	
 	Vector3d m_v3d_manPos;
 	
+	double m_d_runTime;
+	
 	
 	vector<Vector3d> m_vv3d_manPath;
 	int i_pathIndex;
@@ -53,6 +55,7 @@ public:
 	bool m_b_start;					// 程序开始标志
 	bool m_b_checkPoint1;
 	bool m_b_checkPoint2;
+	int m_i_elevatorTime;
 	
 public:
 	vector<string> m_vs_allEntities;
@@ -60,8 +63,9 @@ public:
 public:
 	void turnLeft()
 	{
-		m_pRO_robot->setWheelVelocity(-PI / 4, PI / 4);
-		sleep(1.0);
+		double SCALE = 2;
+		m_pRO_robot->setWheelVelocity(-PI / 4 / SCALE, PI / 4 / SCALE);
+		sleep(1.0 * SCALE);
 		m_pRO_robot->setWheelVelocity(0, 0);
 		Vector3d v3d_oldDir = m_v3d_robotDir;
 		m_v3d_robotDir.x(v3d_oldDir.z());
@@ -70,8 +74,9 @@ public:
 	}
 	void turnRight()
 	{
-		m_pRO_robot->setWheelVelocity(PI / 4, -PI / 4);
-		sleep(1.0);
+		double SCALE = 2;
+		m_pRO_robot->setWheelVelocity(PI / 4 / SCALE, -PI / 4 / SCALE);
+		sleep(1.0 * SCALE);
 		m_pRO_robot->setWheelVelocity(0, 0);
 		Vector3d v3d_oldDir = m_v3d_robotDir;
 		m_v3d_robotDir.x(-v3d_oldDir.z());
@@ -80,8 +85,9 @@ public:
 	}
 	void turnBack()
 	{
-		m_pRO_robot->setWheelVelocity(PI / 2, -PI / 2);
-		sleep(1.0);
+		double SCALE = 4;
+		m_pRO_robot->setWheelVelocity(-PI / 2 / SCALE, PI / 2 / SCALE);
+		sleep(1.0 * SCALE);
 		m_pRO_robot->setWheelVelocity(0, 0);
 		Vector3d v3d_oldDir = m_v3d_robotDir;
 		m_v3d_robotDir.x(-v3d_oldDir.x());
@@ -150,6 +156,8 @@ void MyController::onInit(InitEvent &evt)
 	m_b_checkPoint2 = false;
 	
 	i_pathIndex = 0;
+	m_d_runTime = 0;
+	m_i_elevatorTime = 0;
 	
 	m_pVS_view = (ViewService*)connectToService("SIGViewer");
 	
@@ -189,6 +197,7 @@ void MyController::onInit(InitEvent &evt)
   
 double MyController::onAction(ActionEvent &evt) 
 {  
+	m_d_runTime += TIMEOUT;
 	if(m_b_start == false)
 	{
 		string s_msgStart = "start";  
@@ -221,7 +230,13 @@ double MyController::onAction(ActionEvent &evt)
 #endif		
 		double d_minDis = getMinDistance(3);
 		
-		if(d_minDis < 20 && _dotProductXZ(v3d_diff, m_v3d_robotDir) > 50)
+		if(d_minDis < 50 && m_d_runTime > 10)
+		{
+			m_pRO_robot->setWheelVelocity(0, 0);
+			//return TIMEOUT;
+		}
+		
+		if(d_minDis < 50 && m_d_runTime > 10 && _dotProductXZ(v3d_diff, m_v3d_robotDir) > 50 && m_b_checkPoint1 == false)
 		{
 			cout << "in<40#" << d_minDis;
 			m_pRO_robot->setWheelVelocity(0, 0);
@@ -230,8 +245,47 @@ double MyController::onAction(ActionEvent &evt)
 				m_b_checkPoint1 = true;
 				cout << "CHECKPOINT1 =============" << endl;
 			}
-			return TIMEOUT * 2;
+			return TIMEOUT * 10;
 		}
+		if(d_minDis < 100 || _dotProductXZ(v3d_diff, m_v3d_robotDir) < 100)
+		{
+			m_pRO_robot->setWheelVelocity(0, 0);
+			cout << "Too Close";
+			if(m_b_checkPoint1 == true && m_b_checkPoint2 == false)
+			{
+				double d_leftDis = getMinDistance(1);
+				double d_rightDis = getMinDistance(2);
+				cout << "====="  << d_leftDis << " " << d_rightDis << endl;
+				if(d_leftDis + d_rightDis < 150)
+				{
+					if(m_i_elevatorTime < 5)
+					{
+						m_i_elevatorTime++;
+					}
+					else
+					{
+						sleep(5);
+						string s_msgElevator = "elevator";
+						broadcastMsg(s_msgElevator);
+						m_b_checkPoint2 = true;
+						sleep(5);
+						m_pRO_robot->setWheelVelocity(-10, -10);
+						sleep(3);
+						m_pRO_robot->setWheelVelocity(0, 0);
+						string s_msgOk = "ok";
+						broadcastMsg(s_msgOk);
+						
+						return TIMEOUT;
+					}
+				}
+				else
+				{
+					cout << "Where am I" << endl;
+				}
+				//m_b_checkPoint2 = true;
+			}
+		}
+		
 		// 检测夹角
 		if(fabs(d_arcAngleDiff - 0) < 0.2)
 		{
@@ -265,7 +319,7 @@ double MyController::onAction(ActionEvent &evt)
 		{
 			d_wheelVelocity = v3d_robotdiff.z() / 20;
 		}
-		else if(v3d_robotdiff.z() > 1)
+		else if(v3d_robotdiff.z() > 1 && v3d_diff.length() > 50)
 		{
 			d_wheelVelocity = v3d_robotdiff.z() / 10;
 		}
