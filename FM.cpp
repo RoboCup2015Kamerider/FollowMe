@@ -68,27 +68,18 @@ public:
 	{
 		m_pRO_robot->setWheelVelocity(0, 0);
 	}
+	void moveDis(double d_dis)
+	{
+		m_pRO_robot->setWheelVelocity(d_dis / 10, d_dis / 10);
+		sleep(1.0);
+		stop();
+	}
 	
 public:
 	Vector3d* GETPLANT(int camID);
 	double getMinDistance(int i_camID);
 	bool isInElevator();
-	void elevator()
-	{
-		sleep(3);
-		string s_msgElevator = "elevator";
-		broadcastMsg(s_msgElevator);
-		m_b_checkPoint2 = true;
-		sleep(2);
-		m_pRO_robot->setWheelVelocity(-20, -20);
-		sleep(2);
-		m_pRO_robot->setWheelVelocity(0, 0);
-		string s_msgOk = "ok";
-		broadcastMsg(s_msgOk);
-		sleep(5);
-		m_vv3d_manPath.clear();
-		i_pathIndex = 0;
-	}
+	void elevator();
 };
   
 void MyController::onInit(InitEvent &evt)
@@ -100,9 +91,10 @@ void MyController::onInit(InitEvent &evt)
 	m_pRO_robot->setWheel(m_d_wheelRadius, m_d_wheelDistance);
 	
 	m_pRO_robot->getPosition(m_v3d_initPos);	// 得到机器人的初始位置
-	m_pRO_robot->setWheelVelocity(1.0, 1.0);
+	/*m_pRO_robot->setWheelVelocity(1.0, 1.0);
 	sleep(1.0);
-	m_pRO_robot->setWheelVelocity(0.0, 0.0);
+	m_pRO_robot->setWheelVelocity(0.0, 0.0);*/
+	moveDis(1.0);
 	m_pRO_robot->getPosition(m_v3d_initDir);
 	m_v3d_initDir -= m_v3d_initPos;
 	
@@ -169,7 +161,6 @@ double MyController::onAction(ActionEvent &evt)
 		string s_msgStart = "start";  
 		broadcastMsg(s_msgStart);
 		m_b_start = true;
-		//return TIMEOUT;
 	}
 	//if(m_b_checkPoint1 == false)
 	{
@@ -184,15 +175,14 @@ double MyController::onAction(ActionEvent &evt)
 		
 		Vector3d v3d_robotdiff;
 		
-		double d_angleWorld = v3d_diff.x() / sqrt(pow(v3d_diff.x(), 2) + pow(v3d_diff.z(), 2));
-		
-		double d_angleRobot = m_v3d_robotDir.x() / sqrt(pow(m_v3d_robotDir.x(), 2) + pow(m_v3d_robotDir.z(), 2));
-		
 		double d_angleDiff = (v3d_diff.x() * m_v3d_robotDir.x() + v3d_diff.z() * m_v3d_robotDir.z()) / sqrt(pow(v3d_diff.x(), 2) + pow(v3d_diff.z(), 2));
-		double d_arcAngleDiff = acos(d_angleDiff);
+		//double d_arcAngleDiff = acos(d_angleDiff);
+		
+		double d_arcAngleRobot = atan2(m_v3d_robotDir.x(), m_v3d_robotDir.z());
+		double d_arcAngleDiff = atan2(v3d_diff.x(), v3d_diff.z());
 		
 #ifdef __DEBUG		
-		cout << v3d_diff.x() << "\t" << v3d_diff.z() << "\t" << d_angleWorld << "\t" <<  m_v3d_robotDir.x() << "\t" << m_v3d_robotDir.z() << "\t" << d_angleRobot << "\t" << d_angleDiff << "\t" << d_arcAngleDiff << endl;
+		cout << v3d_diff.x() << "\t" << v3d_diff.z()  << "\t" <<  m_v3d_robotDir.x() << "\t" << m_v3d_robotDir.z() << "\t" << d_angleDiff << "\t" << d_arcAngleDiff << endl;
 #endif		
 		double d_minDis = getMinDistance(3);
 		
@@ -215,36 +205,10 @@ double MyController::onAction(ActionEvent &evt)
 		if(isInElevator() && m_b_checkPoint2 == false)
 		{
 			double d_checkDis = _dotProductXZ(v3d_diff, m_v3d_robotDir) - 50;
-			double d_vel = d_checkDis / 10;
-			m_pRO_robot->setWheelVelocity(d_vel, d_vel);
-			sleep(1.0);
-			stop();
+			moveDis(d_checkDis);
 			elevator();
 			return TIMEOUT;
 		}
-		/*if((d_minDis < 60 || _dotProductXZ(v3d_diff, m_v3d_robotDir) < 60) && m_d_runTime > 30)
-		{
-			m_pRO_robot->setWheelVelocity(0, 0);
-			cout << "Too Close";
-			if(m_b_checkPoint1 == true && m_b_checkPoint2 == false)
-			{
-				if(isInElevator())
-				{
-					elevator();
-					return TIMEOUT;
-				}
-				else
-				{
-					cout << "Where am I" << endl;
-				}
-				//m_b_checkPoint2 = true;
-			}
-			else
-			{
-				m_pRO_robot->setWheelVelocity(0, 0);
-				return TIMEOUT;
-			}
-		}*/
 		
 		// 检测夹角
 		if(fabs(d_arcAngleDiff - 0) < 0.2)
@@ -258,17 +222,21 @@ double MyController::onAction(ActionEvent &evt)
 			cout << "in>0.1#";
 			v3d_robotdiff.z(_dotProductXZ(v3d_diff, m_v3d_robotDir));
 		}
-		else if(fabs(d_arcAngleDiff - PI / 2) < 0.2)
+		//else if(fabs(d_arcAngleDiff - PI / 2) < 0.2)
+		else if(fabs(d_arcAngleDiff - d_arcAngleRobot + PI / 2) < 0.2
+		|| fabs(d_arcAngleDiff - d_arcAngleRobot - PI * 3 / 2) < 0.2)
 		{
 			turnRight();
 			return TIMEOUT;
 		}
-		else if(fabs(d_arcAngleDiff + PI / 2) < 0.2)
+		//else if(fabs(d_arcAngleDiff + PI / 2) < 0.2)
+		else if(fabs(d_arcAngleDiff - d_arcAngleRobot - PI / 2) < 0.2
+		|| fabs(d_arcAngleDiff - d_arcAngleRobot + PI * 3 / 2) < 0.2)
 		{
 			turnLeft();
 			return TIMEOUT;
 		}
-		else if(fabs(d_arcAngleDiff - PI) < 0.2)
+		else if(fabs(d_arcAngleDiff - d_arcAngleRobot - PI) < 0.2)
 		{
 			turnBack();
 			return TIMEOUT;
@@ -453,12 +421,12 @@ bool MyController::isInElevator()
 		static int i_elevatorTime = 0;
 		double d_leftDis = getMinDistance(1);
 		double d_rightDis = getMinDistance(2);
-#ifdef __DEBUG
+#ifdef __DEBUG_OLD
 		cout << "====="  << d_leftDis << " " << d_rightDis << endl;
 #endif
 		if(d_leftDis + d_rightDis < 150)
 		{
-			if(i_elevatorTime < 5)
+			if(i_elevatorTime < 6)
 			{
 				i_elevatorTime++;
 				return false;
@@ -474,6 +442,22 @@ bool MyController::isInElevator()
 			;//i_elevatorTime--;
 		}
 		return false;
+	}
+void MyController::elevator()
+	{
+		sleep(3);
+		string s_msgElevator = "elevator";
+		broadcastMsg(s_msgElevator);
+		m_b_checkPoint2 = true;
+		sleep(2);
+		m_pRO_robot->setWheelVelocity(-20, -20);
+		sleep(2);
+		m_pRO_robot->setWheelVelocity(0, 0);
+		string s_msgOk = "ok";
+		broadcastMsg(s_msgOk);
+		sleep(5);
+		m_vv3d_manPath.clear();
+		i_pathIndex = 0;
 	}
 extern "C" Controller * createController() 
 {  
