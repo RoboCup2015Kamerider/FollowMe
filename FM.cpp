@@ -1,10 +1,14 @@
 #include "ControllerEvent.h"
 #include "Controller.h"
 #include "Logger.h"
-#include "iostream"
-#include "vector"
+#include <iostream>
+#include <vector>
+#include <ViewImage.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #define PI 3.1415926
+#define TIMEOUT 0.2
 
 #define __DEBUG
 
@@ -28,6 +32,8 @@ public:
 	
 	SimObj *m_pSO_man;
 	
+	ViewService *m_pVS_view;
+	
 	Vector3d m_v3d_initPos;				// 机器人初始位置
 	Vector3d m_v3d_initDir;				// 机器人初始朝向
 	
@@ -46,6 +52,7 @@ public:
 public:
 	bool m_b_start;					// 程序开始标志
 	bool m_b_checkPoint1;
+	bool m_b_checkPoint2;
 	
 public:
 	vector<string> m_vs_allEntities;
@@ -81,6 +88,35 @@ public:
 		m_v3d_robotDir.z(-v3d_oldDir.z());
 		cout << "turn back" << endl;
 	}
+	
+public:
+	Vector3d* GETPLANT(int camID);
+	double getMinDistance(int i_camID)
+	{
+		//Vector3d* pv3d_dis = GETPLANT(i_camID);
+		ViewImage* pVI_img = m_pVS_view->distanceSensor2D(0.0, 255.0, i_camID);
+		char *dis_buf = pVI_img->getBuffer();
+		
+ 		int i_width = 320;
+ 		int i_height = 240;
+ 		
+ 		double d_minDis = 1e10;
+ 		for(int i = 0; i < i_height; i++)
+ 		{
+ 			for(int j = 0; j < i_width; j++)
+ 			{
+ 				//double d_dis = pv3d_dis[i * i_width + j].z();
+ 				double d_dis = (unsigned char)dis_buf[i * i_width + j];
+ 				if(d_dis < d_minDis)
+ 				{
+ 					d_minDis = d_dis;
+ 				}
+ 			}
+		}
+		cout << "min dis = " << d_minDis;
+
+		return d_minDis;
+	}
 };  
   
 void MyController::onInit(InitEvent &evt)
@@ -111,8 +147,11 @@ void MyController::onInit(InitEvent &evt)
 	
 	m_b_start = false;
 	m_b_checkPoint1 = false;
+	m_b_checkPoint2 = false;
 	
 	i_pathIndex = 0;
+	
+	m_pVS_view = (ViewService*)connectToService("SIGViewer");
 	
 	bool b_getAllEntities = getAllEntities(m_vs_allEntities);
 	
@@ -155,8 +194,9 @@ double MyController::onAction(ActionEvent &evt)
 		string s_msgStart = "start";  
 		broadcastMsg(s_msgStart);
 		m_b_start = true;
+		//return TIMEOUT;
 	}
-	if(m_b_checkPoint1 == false)
+	//if(m_b_checkPoint1 == false)
 	{
 		m_pSO_man->getPosition(m_v3d_manPos);
 		m_vv3d_manPath.push_back(m_v3d_manPos);
@@ -179,6 +219,19 @@ double MyController::onAction(ActionEvent &evt)
 #ifdef __DEBUG		
 		cout << v3d_diff.x() << "\t" << v3d_diff.z() << "\t" << d_angleWorld << "\t" <<  m_v3d_robotDir.x() << "\t" << m_v3d_robotDir.z() << "\t" << d_angleRobot << "\t" << d_angleDiff << "\t" << d_arcAngleDiff << endl;
 #endif		
+		double d_minDis = getMinDistance(3);
+		
+		if(d_minDis < 20 && _dotProductXZ(v3d_diff, m_v3d_robotDir) > 50)
+		{
+			cout << "in<40#" << d_minDis;
+			m_pRO_robot->setWheelVelocity(0, 0);
+			if(m_b_checkPoint1 == false)
+			{
+				m_b_checkPoint1 = true;
+				cout << "CHECKPOINT1 =============" << endl;
+			}
+			return TIMEOUT * 2;
+		}
 		// 检测夹角
 		if(fabs(d_arcAngleDiff - 0) < 0.2)
 		{
@@ -194,17 +247,17 @@ double MyController::onAction(ActionEvent &evt)
 		else if(fabs(d_arcAngleDiff - PI / 2) < 0.2)
 		{
 			turnRight();
-			return 1.0;
+			return TIMEOUT;
 		}
 		else if(fabs(d_arcAngleDiff + PI / 2) < 0.2)
 		{
 			turnLeft();
-			return 1.0;
+			return TIMEOUT;
 		}
 		else if(fabs(d_arcAngleDiff - PI) < 0.2)
 		{
 			turnBack();
-			return 1.0;
+			return TIMEOUT;
 		}
 		
 		double d_wheelVelocity;
@@ -212,7 +265,7 @@ double MyController::onAction(ActionEvent &evt)
 		{
 			d_wheelVelocity = v3d_robotdiff.z() / 20;
 		}
-		else if(v3d_robotdiff.z() > 0.1)
+		else if(v3d_robotdiff.z() > 1)
 		{
 			d_wheelVelocity = v3d_robotdiff.z() / 10;
 		}
@@ -222,7 +275,7 @@ double MyController::onAction(ActionEvent &evt)
 		i_pathIndex++;
 		
 	}
-  	return 1.0;      
+  	return TIMEOUT;      
 }  
   
 void MyController::onRecvMsg(RecvMsgEvent &evt) 
@@ -232,7 +285,92 @@ void MyController::onRecvMsg(RecvMsgEvent &evt)
 void MyController::onCollision(CollisionEvent &evt) 
 { 
 }
-  
+Vector3d* MyController::GETPLANT(int camID) 
+{
+	if(m_pVS_view != NULL) 
+	{ 
+       		ViewImage *dis_img = m_pVS_view->distanceSensor2D(0.0, 255.0, camID, DEPTHBIT_8, IMAGE_320X240);   
+ 
+  		double fovy = m_pRO_robot->getCamFOV() * PI / 180.0;
+  		double ar = m_pRO_robot->getCamAS();  
+
+                double fovx = 2 * atan(tan(fovy * 0.5) * ar);  
+
+                char *dis_buf = dis_img->getBuffer();  
+                  
+		int width = dis_img->getWidth();
+                int height = dis_img->getHeight();
+	          
+		Vector3d *p = new Vector3d[height * width];
+                double *theta = new double[width]; 
+		double *phi = new double[height];
+
+	        unsigned char *distance = new unsigned char[height*width];
+
+		double *y = new double[height * width];
+		double *x = new double[height * width];
+		double *z = new double[height * width];
+		//ou << "====" << endl;
+		int index;
+		for(int i = 0; i < height; i++)
+		{
+			phi[i] = fovy / 2.0 - fovy * i / (height - 1.0);  
+		    	for(int j = 0; j < width; j++)
+			{
+                        	theta[j] = fovx * j / (width - 1.0) - fovx / 2.0;  
+		  		index = i * width + j;
+		  		distance[index] = dis_buf[index]; 
+				//ou << int(distance[index]) << "\t";
+		    	}  
+			//ou << endl;
+		}
+		int *dis = new int[height * width];
+		int *disv = new int[height];
+		int *dish = new int[width];
+		double *angle = new double[height * width];
+
+		
+		for(int i = 0; i < height; i++)
+		{
+		  	disv[i] = distance[i * width + width / 2];
+		  	//disv[i] = disv[i];
+		  	for(int j = 0;j < width; j++)
+			{
+				index = i * width + j;
+				dis[index]=distance[index];
+				//dis[index]=4*dis[index];
+		        	dish[j]=distance[width*height/2+j];
+		        	//dish[j]=4*dish[j];
+				y[index]=disv[i]*sin(phi[i])+30;
+				x[index]=dish[j]*sin(theta[j]);
+				angle[index]=asin((dish[0]*sin(fovx/2)*(width/2-j))/(dis[index]*width/2));
+			
+				z[index]=dis[index]*cos(angle[index])*cos(phi[i])+10;
+		  	}
+		}
+		for(int i=0;i<height;i++)
+		{
+		  	for(int j=0;j<width;j++)
+			{
+				index=i*width+j;
+				p[index]=Vector3d(x[index],y[index],z[index]);
+		  	}
+		}
+
+		delete theta;
+		delete phi;
+		delete distance;
+		delete dis;
+		delete disv;
+		delete dish;
+		delete x;
+		delete y;
+		delete z;
+
+		return p;
+	}
+	return NULL;
+}
 extern "C" Controller * createController() 
 {  
   	return new MyController;  
