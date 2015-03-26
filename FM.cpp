@@ -61,69 +61,35 @@ public:
 	vector<string> m_vs_allEntities;
 	
 public:
-	void turnLeft()
+	void turnLeft();
+	void turnRight();
+	void turnBack();
+	void stop()
 	{
-		double SCALE = 2;
-		m_pRO_robot->setWheelVelocity(-PI / 4 / SCALE, PI / 4 / SCALE);
-		sleep(1.0 * SCALE);
 		m_pRO_robot->setWheelVelocity(0, 0);
-		Vector3d v3d_oldDir = m_v3d_robotDir;
-		m_v3d_robotDir.x(v3d_oldDir.z());
-		m_v3d_robotDir.z(-v3d_oldDir.x());
-		cout << "turn left" << endl;
-	}
-	void turnRight()
-	{
-		double SCALE = 2;
-		m_pRO_robot->setWheelVelocity(PI / 4 / SCALE, -PI / 4 / SCALE);
-		sleep(1.0 * SCALE);
-		m_pRO_robot->setWheelVelocity(0, 0);
-		Vector3d v3d_oldDir = m_v3d_robotDir;
-		m_v3d_robotDir.x(-v3d_oldDir.z());
-		m_v3d_robotDir.z(v3d_oldDir.x());
-		cout << "turn right" << endl;
-	}
-	void turnBack()
-	{
-		double SCALE = 4;
-		m_pRO_robot->setWheelVelocity(-PI / 2 / SCALE, PI / 2 / SCALE);
-		sleep(1.0 * SCALE);
-		m_pRO_robot->setWheelVelocity(0, 0);
-		Vector3d v3d_oldDir = m_v3d_robotDir;
-		m_v3d_robotDir.x(-v3d_oldDir.x());
-		m_v3d_robotDir.z(-v3d_oldDir.z());
-		cout << "turn back" << endl;
 	}
 	
 public:
 	Vector3d* GETPLANT(int camID);
-	double getMinDistance(int i_camID)
+	double getMinDistance(int i_camID);
+	bool isInElevator();
+	void elevator()
 	{
-		//Vector3d* pv3d_dis = GETPLANT(i_camID);
-		ViewImage* pVI_img = m_pVS_view->distanceSensor2D(0.0, 255.0, i_camID);
-		char *dis_buf = pVI_img->getBuffer();
-		
- 		int i_width = 320;
- 		int i_height = 240;
- 		
- 		double d_minDis = 1e10;
- 		for(int i = 0; i < i_height; i++)
- 		{
- 			for(int j = 0; j < i_width; j++)
- 			{
- 				//double d_dis = pv3d_dis[i * i_width + j].z();
- 				double d_dis = (unsigned char)dis_buf[i * i_width + j];
- 				if(d_dis < d_minDis)
- 				{
- 					d_minDis = d_dis;
- 				}
- 			}
-		}
-		cout << "min dis = " << d_minDis;
-
-		return d_minDis;
+		sleep(3);
+		string s_msgElevator = "elevator";
+		broadcastMsg(s_msgElevator);
+		m_b_checkPoint2 = true;
+		sleep(2);
+		m_pRO_robot->setWheelVelocity(-20, -20);
+		sleep(2);
+		m_pRO_robot->setWheelVelocity(0, 0);
+		string s_msgOk = "ok";
+		broadcastMsg(s_msgOk);
+		sleep(5);
+		m_vv3d_manPath.clear();
+		i_pathIndex = 0;
 	}
-};  
+};
   
 void MyController::onInit(InitEvent &evt)
 {
@@ -163,7 +129,7 @@ void MyController::onInit(InitEvent &evt)
 	
 	bool b_getAllEntities = getAllEntities(m_vs_allEntities);
 	
-#ifdef __DEBUG
+#ifdef __DEBUG_OLD
 	cout << "m_v3d_initPos = " << m_v3d_initPos.x() << " " << m_v3d_initPos.y() << " " << m_v3d_initPos.z() << endl;
 	cout << "m_v3d_initDir = " << m_v3d_initDir.x() << " " << m_v3d_initDir.y() << " " << m_v3d_initDir.z() << endl;
 #endif
@@ -232,14 +198,13 @@ double MyController::onAction(ActionEvent &evt)
 		
 		if(d_minDis < 50 && m_d_runTime > 10)
 		{
-			m_pRO_robot->setWheelVelocity(0, 0);
-			//return TIMEOUT;
+			stop();
 		}
 		
 		if(d_minDis < 50 && m_d_runTime > 10 && _dotProductXZ(v3d_diff, m_v3d_robotDir) > 50 && m_b_checkPoint1 == false)
 		{
 			cout << "in<40#" << d_minDis;
-			m_pRO_robot->setWheelVelocity(0, 0);
+			stop();
 			if(m_b_checkPoint1 == false)
 			{
 				m_b_checkPoint1 = true;
@@ -247,36 +212,26 @@ double MyController::onAction(ActionEvent &evt)
 			}
 			return TIMEOUT * 10;
 		}
-		if(d_minDis < 100 || _dotProductXZ(v3d_diff, m_v3d_robotDir) < 100)
+		if(isInElevator() && m_b_checkPoint2 == false)
+		{
+			double d_checkDis = _dotProductXZ(v3d_diff, m_v3d_robotDir) - 50;
+			double d_vel = d_checkDis / 10;
+			m_pRO_robot->setWheelVelocity(d_vel, d_vel);
+			sleep(1.0);
+			stop();
+			elevator();
+			return TIMEOUT;
+		}
+		/*if((d_minDis < 60 || _dotProductXZ(v3d_diff, m_v3d_robotDir) < 60) && m_d_runTime > 30)
 		{
 			m_pRO_robot->setWheelVelocity(0, 0);
 			cout << "Too Close";
 			if(m_b_checkPoint1 == true && m_b_checkPoint2 == false)
 			{
-				double d_leftDis = getMinDistance(1);
-				double d_rightDis = getMinDistance(2);
-				cout << "====="  << d_leftDis << " " << d_rightDis << endl;
-				if(d_leftDis + d_rightDis < 150)
+				if(isInElevator())
 				{
-					if(m_i_elevatorTime < 5)
-					{
-						m_i_elevatorTime++;
-					}
-					else
-					{
-						sleep(5);
-						string s_msgElevator = "elevator";
-						broadcastMsg(s_msgElevator);
-						m_b_checkPoint2 = true;
-						sleep(5);
-						m_pRO_robot->setWheelVelocity(-10, -10);
-						sleep(3);
-						m_pRO_robot->setWheelVelocity(0, 0);
-						string s_msgOk = "ok";
-						broadcastMsg(s_msgOk);
-						
-						return TIMEOUT;
-					}
+					elevator();
+					return TIMEOUT;
 				}
 				else
 				{
@@ -284,7 +239,12 @@ double MyController::onAction(ActionEvent &evt)
 				}
 				//m_b_checkPoint2 = true;
 			}
-		}
+			else
+			{
+				m_pRO_robot->setWheelVelocity(0, 0);
+				return TIMEOUT;
+			}
+		}*/
 		
 		// 检测夹角
 		if(fabs(d_arcAngleDiff - 0) < 0.2)
@@ -339,6 +299,32 @@ void MyController::onRecvMsg(RecvMsgEvent &evt)
 void MyController::onCollision(CollisionEvent &evt) 
 { 
 }
+double MyController::getMinDistance(int i_camID)
+	{
+		//Vector3d* pv3d_dis = GETPLANT(i_camID);
+		ViewImage* pVI_img = m_pVS_view->distanceSensor2D(0.0, 255.0, i_camID);
+		char *dis_buf = pVI_img->getBuffer();
+		
+ 		int i_width = 320;
+ 		int i_height = 240;
+ 		
+ 		double d_minDis = 1e10;
+ 		for(int i = 0; i < i_height; i++)
+ 		{
+ 			for(int j = 0; j < i_width; j++)
+ 			{
+ 				//double d_dis = pv3d_dis[i * i_width + j].z();
+ 				double d_dis = (unsigned char)dis_buf[i * i_width + j];
+ 				if(d_dis < d_minDis)
+ 				{
+ 					d_minDis = d_dis;
+ 				}
+ 			}
+		}
+		cout << "min dis = " << d_minDis;
+
+		return d_minDis;
+	}
 Vector3d* MyController::GETPLANT(int camID) 
 {
 	if(m_pVS_view != NULL) 
@@ -425,6 +411,70 @@ Vector3d* MyController::GETPLANT(int camID)
 	}
 	return NULL;
 }
+void MyController::turnLeft()
+	{
+		double SCALE = 1;
+		m_pRO_robot->setWheelVelocity(-PI / 4 / SCALE, PI / 4 / SCALE);
+		sleep(1.0 * SCALE);
+		m_pRO_robot->setWheelVelocity(0, 0);
+		Vector3d v3d_oldDir = m_v3d_robotDir;
+		m_v3d_robotDir.x(v3d_oldDir.z());
+		m_v3d_robotDir.z(-v3d_oldDir.x());
+		cout << "turn left" << endl;
+	}
+	void MyController::turnRight()
+	{
+		double SCALE = 1;
+		m_pRO_robot->setWheelVelocity(PI / 4 / SCALE, -PI / 4 / SCALE);
+		sleep(1.0 * SCALE);
+		m_pRO_robot->setWheelVelocity(0, 0);
+		Vector3d v3d_oldDir = m_v3d_robotDir;
+		m_v3d_robotDir.x(-v3d_oldDir.z());
+		m_v3d_robotDir.z(v3d_oldDir.x());
+		cout << "turn right" << endl;
+	}
+	void MyController::turnBack()
+	{
+		double SCALE = 2;
+		m_pRO_robot->setWheelVelocity(-PI / 2 / SCALE, PI / 2 / SCALE);
+		sleep(1.0 * SCALE);
+		m_pRO_robot->setWheelVelocity(0, 0);
+		Vector3d v3d_oldDir = m_v3d_robotDir;
+		m_v3d_robotDir.x(-v3d_oldDir.x());
+		m_v3d_robotDir.z(-v3d_oldDir.z());
+		cout << "turn back" << endl;
+	}
+bool MyController::isInElevator()
+{
+	if(m_b_checkPoint1 == false)
+	{
+		return false;
+	}
+		static int i_elevatorTime = 0;
+		double d_leftDis = getMinDistance(1);
+		double d_rightDis = getMinDistance(2);
+#ifdef __DEBUG
+		cout << "====="  << d_leftDis << " " << d_rightDis << endl;
+#endif
+		if(d_leftDis + d_rightDis < 150)
+		{
+			if(i_elevatorTime < 5)
+			{
+				i_elevatorTime++;
+				return false;
+			}
+			else
+			{
+				return true;
+				
+			}
+		}
+		else
+		{
+			;//i_elevatorTime--;
+		}
+		return false;
+	}
 extern "C" Controller * createController() 
 {  
   	return new MyController;  
