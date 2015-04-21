@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="utf8"?>
+<world name="myworld1">
+  <gravity x="0.0" y="-980.7" z="0.0"/>
+
+  <instanciate class="Man-nii.xml">  
+    <set-attr-value name="name" value="operator"/>  
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./Operator.so"/>
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-50.0"/>  
+    <set-attr-value name="y" value="60.0"/>  
+    <set-attr-value name="z" value="-350.0"/>
+    <set-attr-value name="collision" value="true"/>  
+  </instanciate>
+
+  <instanciate class="Man_02.xml">  
+    <set-attr-value name="name" value="man_001"/>  
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./FollowMeHuman.so"/>
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-525.0"/>  
+    <set-attr-value name="y" value="60.0"/>  
+    <set-attr-value name="z" value="650.0"/>
+    <set-attr-value name="qw" value="0.0"/>  
+    <set-attr-value name="qy" value="1.0"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+
+	<instanciate class="seModerator.xml">  
+    <set-attr-value name="name" value="checkpoint_001"/> 
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./CheckPoint.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-525.0"/>  
+    <set-attr-value name="y" value="60.0"/>  
+    <set-attr-value name="z" value="575.0"/>
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>
+	<instanciate class="seModerator.xml">  
+    <set-attr-value name="name" value="checkpoint_002"/> 
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./CheckPoint2.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-1100.0"/>  
+    <set-attr-value name="y" value="60.0"/>  
+    <set-attr-value name="z" value="275.0"/>
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>
+	<instanciate class="CheckPoint.xml">  
+    <set-attr-value name="name" value="ITP_01"/> 
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./ITP1.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-720.0"/>  
+    <set-attr-value name="y" value="5.0"/>  
+    <set-attr-value name="z" value="575.0"/>
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>
+	<instanciate class="CheckPoint.xml">  
+    <set-attr-value name="name" value="ITP_02"/>
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./ITP2.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-800.0"/>  
+    <set-attr-value name="y" value="5.0"/>  
+    <set-attr-value name="z" value="0.0"/>
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>
+	<instanciate class="CheckPoint.xml">  
+    <set-attr-value name="name" value="FinishLine"/> 
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./FinishLine.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-800.0"/>  
+    <set-attr-value name="y" value="5.0"/>  
+    <set-attr-value name="z" value="-650.0"/>
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>
+	<!--<instanciate class="CheckPoint.xml">  
+    <set-attr-value name="name" value="finish_line"/> 
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./FinishLine.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-800.0"/>  
+    <set-attr-value name="y" value="5.0"/>  
+    <set-attr-value name="z" value="-700.0"/>
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>-->
+	<instanciate class="seModerator.xml">  
+    <set-attr-value name="name" value="score"/> 
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./score.so"/> 
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="0.0"/>  
+    <set-attr-value name="y" value="250.0"/>  
+    <set-attr-value name="z" value="0.0"/>
+    <set-attr-value name="collision" value="false"/>
+  </instanciate>
+
+	<instanciate class="Robot-nii.xml">  
+		<set-attr-value name="name" value="robot_000"/>  
+		<set-attr-value name="dynamics" value="false"/>  
+		<set-attr-value name="x" value="-800.0"/>  
+		<set-attr-value name="y" value="60.0"/>  
+		<set-attr-value name="z" value="-300.0"/>  
+		<set-attr-value name="collision" value="true"/>
+  </instanciate>  
+	<instanciate class="Robot-nii.xml">  
+		<set-attr-value name="name" value="robot_001"/>  
+		<set-attr-value name="dynamics" value="false"/>  
+		<set-attr-value name="x" value="-850.0"/>  
+		<set-attr-value name="y" value="60.0"/>  
+		<set-attr-value name="z" value="-300.0"/>  
+		<set-attr-value name="collision" value="true"/>
+   </instanciate>
+   <instanciate class="Robot-nii.xml">  
+		<set-attr-value name="name" value="robot_002"/>  
+		<set-attr-value name="dynamics" value="false"/>  
+		<set-attr-value name="x" value="-900.0"/>  
+		<set-attr-value name="y" value="60.0"/>  
+		<set-attr-value name="z" value="-300.0"/>  
+		<set-attr-value name="collision" value="true"/>
+  </instanciate> 
+  <instanciate class="Robot-nii.xml">  
+		<set-attr-value name="name" value="robot_003"/>  
+		<set-attr-value name="dynamics" value="false"/>  
+		<set-attr-value name="x" value="-850.0"/>  
+		<set-attr-value name="y" value="60.0"/>  
+		<set-attr-value name="z" value="-250.0"/> 
+		<set-attr-value name="collision" value="true"/> 
+  </instanciate> 
+  <instanciate class="WheelRobot-nii-v1.xml" type="Robot">
+    <set-attr-value name="name" value="robot_004"/>
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./SFollowMe.so"/>
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="x" value="-50.0"/>
+    <set-attr-value name="y" value="30.0"/>
+    <set-attr-value name="z" value="-450.0"/>
+    <set-attr-value name="collision" value="true"/>
+    <camera id="1"  
+            link="WAIST_LINK0"
+            direction="1.0 0.0 0.0"  
+            position="15.0 15.0 0.0"/>
+    <camera id="2"  
+            link="WAIST_LINK0"
+            direction="0.0 0.0 1.0"  
+            position="15.0 25.0 15.0"/>
+    <camera id="3"  
+            link="WAIST_LINK0"
+            direction="0.0 0.0 1.0"  
+            position="-15.0 25.0 15.0"/>  
+    <camera id="4"  
+            link="WAIST_LINK0"
+            direction="-1.0 0.0 0.0"  
+            position="-15.0 15.0 0.0"/>    
+  </instanciate>
+
+<!--   <instanciate class="Robot-nii.xml">  
+        <set-attr-value name="name" value="robot_010"/>  
+        <set-attr-value name="dynamics" value="false"/>  
+        <set-attr-value name="x" value="-50.0"/>  
+        <set-attr-value name="y" value="60.0"/>  
+        <set-attr-value name="z" value="0.0"/> 
+        <set-attr-value name="collision" value="true"/> 
+  </instanciate> -->
+
+	<!--House-->
+	<instanciate class="Floor_B.xml">
+		<set-attr-value name="name" value="floor_b"/>
+		<set-attr-value name="x" value="-125.0"/>
+		<set-attr-value name="y" value="0.5"/>
+		<set-attr-value name="z" value="250.0"/>
+		<set-attr-value name="scalex" value="9.5"/>  
+		<set-attr-value name="scaley" value="1.0"/>  
+		<set-attr-value name="scalez" value="15.0"/>  
+		<set-attr-value name="dynamics" value="false"/>
+		<set-attr-value name="collision" value="false"/>
+		<set-attr-value name="graspable" value="false"/>
+	</instanciate>
+  <instanciate class="L_Wall.xml">  
+    <set-attr-value name="name" value="lwall_000"/>  
+    <set-attr-value name="x" value="-600.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="0.0"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="L_Wall.xml">  
+    <set-attr-value name="name" value="lwall_001"/>  
+    <set-attr-value name="x" value="350.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="0.0"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>  
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_001"/>  
+    <set-attr-value name="x" value="-525.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-500.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="M_Wall.xml">  
+    <set-attr-value name="name" value="mwall_000"/>  
+    <set-attr-value name="x" value="-50.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-500.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="M_Wall.xml">  
+    <set-attr-value name="name" value="mwall_002"/>  
+    <set-attr-value name="x" value="-50.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="1000.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_002"/>  
+    <set-attr-value name="x" value="275.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-500.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_003"/>  
+    <set-attr-value name="x" value="275.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="1000.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_004"/>  
+    <set-attr-value name="x" value="-525.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="1000.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_005"/>  
+    <set-attr-value name="x" value="-375.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="1000.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="S_Wall.xml">  
+    <set-attr-value name="name" value="swall_000"/>  
+    <set-attr-value name="x" value="-600.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="825.0"/>   
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="M_Wall.xml">  
+    <set-attr-value name="name" value="mwall_001"/>  
+    <set-attr-value name="x" value="350.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="750.0"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <!--Inside wall-->
+  <instanciate class="M_Wall.xml">  
+    <set-attr-value name="name" value="mwall_003"/>  
+    <set-attr-value name="x" value="100.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="650.0"/> 
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/> 
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="S_Wall.xml">  
+    <set-attr-value name="name" value="swall_003"/>  
+    <set-attr-value name="x" value="-300.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="825.0"/>   
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_006"/>  
+    <set-attr-value name="x" value="-200.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-425.0"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="S_Wall.xml">  
+    <set-attr-value name="name" value="swall_001"/>  
+    <set-attr-value name="x" value="-200.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-50.0"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="S_Wall.xml">  
+    <set-attr-value name="name" value="swall_002"/>  
+    <set-attr-value name="x" value="180.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="200.0"/> 
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+
+	<!--Dining-->  
+  <instanciate class="seTV.xml">  
+    <set-attr-value name="name" value="TV_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="300.0"/>  
+    <set-attr-value name="y" value="87.3"/>  
+    <set-attr-value name="z" value="400.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/> 
+    <set-attr-value name="visStateAttrName" value="switch"/>  
+    <set-attr-value name="switch" value="on"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>  
+  <instanciate class="seTVbass_B.xml">  
+    <set-attr-value name="name" value="TVdai_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="290.0"/>  
+    <set-attr-value name="y" value="25.1"/>  
+    <set-attr-value name="z" value="400.0"/> 
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>  
+  <instanciate class="A1_sofas.xml">  
+    <set-attr-value name="name" value="_sofas_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="100.0"/>  
+    <set-attr-value name="y" value="31.5"/>  
+    <set-attr-value name="z" value="420.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+
+	<!--Living-->
+  <instanciate class="seBookShelf_A.xml">  
+    <set-attr-value name="name" value="BookShelf_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="300.0"/>  
+    <set-attr-value name="y" value="75.0"/>  
+    <set-attr-value name="z" value="850.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>  
+  <instanciate class="seBookShelf_B.xml">  
+    <set-attr-value name="name" value="BookShelf_1"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="150.0"/>  
+    <set-attr-value name="y" value="59.5"/>  
+    <set-attr-value name="z" value="960.0"/>  
+    <set-attr-value name="qw" value="0.0"/>  
+    <set-attr-value name="qy" value="1.0"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+
+	<!--Kitchen-->
+  <instanciate class="A1_kitchen.xml">  
+    <set-attr-value name="name" value="_kitchen_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="250.0"/>  
+    <set-attr-value name="y" value="91.5"/>  
+    <set-attr-value name="z" value="-370.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="A1_kitchen_table.xml">  
+    <set-attr-value name="name" value="_kitchen_table_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="150.0"/>  
+    <set-attr-value name="y" value="30.5"/>  
+    <set-attr-value name="z" value="-200.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="seBookShelf_A.xml">  
+    <set-attr-value name="name" value="BookShelf_2"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-150.0"/>  
+    <set-attr-value name="y" value="75.0"/>  
+    <set-attr-value name="z" value="-50.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+
+	<!--Bed room-->
+  <instanciate class="seBabybed.xml">  
+    <set-attr-value name="name" value="Babybed_0"/>  
+    <set-attr-value name="dynamics" value="false"/>  
+    <set-attr-value name="x" value="-450.0"/>  
+    <set-attr-value name="y" value="81.5"/>  
+    <set-attr-value name="z" value="825.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="-0.707"/>  
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+
+	<!--Lobby-->
+	<instanciate class="Floor_A.xml">
+		<set-attr-value name="name" value="floor_a"/>
+		<set-attr-value name="x" value="-950.0"/>
+		<set-attr-value name="y" value="0.5"/>
+		<set-attr-value name="z" value="250.0"/>
+		<set-attr-value name="scalex" value="7.0"/>  
+		<set-attr-value name="scaley" value="1.0"/>  
+		<set-attr-value name="scalez" value="15.0"/>  
+		<set-attr-value name="dynamics" value="false"/>
+		<set-attr-value name="collision" value="false"/>
+		<set-attr-value name="graspable" value="false"/>
+	</instanciate>
+  <instanciate class="S_Wall.xml">
+    <set-attr-value name="name" value="swall_010"/>
+    <set-attr-value name="x" value="-775.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="1000.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="S_Wall.xml">
+    <set-attr-value name="name" value="swall_011"/>
+    <set-attr-value name="x" value="-1125.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="1000.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="L_Wall.xml">  
+    <set-attr-value name="name" value="lwall_010"/>  
+    <set-attr-value name="x" value="-1300.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="0.0"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>  
+  <instanciate class="M_Wall.xml">  
+    <set-attr-value name="name" value="mwall_010"/>  
+    <set-attr-value name="x" value="-1300.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="750.0"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="S_Wall.xml">  
+    <set-attr-value name="name" value="swall_012"/>  
+    <set-attr-value name="x" value="-1125.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-500.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="Wall.xml">  
+    <set-attr-value name="name" value="wall_010"/>  
+    <set-attr-value name="x" value="-675.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="-500.0"/>  
+    <set-attr-value name="qw" value="0.707"/>  
+    <set-attr-value name="qy" value="0.707"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  
+  <!--EV-->
+  <instanciate class="S_Wall_EV.xml">  
+    <set-attr-value name="name" value="swall_020"/>  
+    <set-attr-value name="x" value="-1100.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="200.0"/> 
+		<set-attr-value name="scalex" value="3.5"/>  
+		<set-attr-value name="scaley" value="1.0"/>  
+		<set-attr-value name="scalez" value="5.0"/>  
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="collision" value="true"/>
+  </instanciate>
+  <instanciate class="S_Wall_EV.xml">  
+    <set-attr-value name="name" value="swall_021"/>  
+    <set-attr-value name="x" value="-1100.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="350.0"/> 
+		<set-attr-value name="scalex" value="3.5"/>  
+		<set-attr-value name="scaley" value="1.0"/>  
+		<set-attr-value name="scalez" value="5.0"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall_EV.xml">  
+    <set-attr-value name="name" value="wall_020"/>  
+    <set-attr-value name="x" value="-1275.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="275.0"/>   
+		<set-attr-value name="scalex" value="5.0"/>  
+		<set-attr-value name="scaley" value="1.0"/>  
+		<set-attr-value name="scalez" value="1.5"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+  <instanciate class="Wall_EV.xml"> 
+    <set-attr-value name="name" value="wall_008"/>
+    <set-attr-value name="language" value="c++"/>  
+    <set-attr-value name="implementation"
+                    value="./Wall.so"/>
+    <set-attr-value name="x" value="-925.0"/>  
+    <set-attr-value name="y" value="50.0"/>  
+    <set-attr-value name="z" value="125.0"/>   
+		<set-attr-value name="scalex" value="5.0"/>  
+		<set-attr-value name="scaley" value="1.0"/>  
+		<set-attr-value name="scalez" value="1.5"/>  
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="dynamics" value="false"/>
+  </instanciate>
+
+<!--Moderator-->
+  <instanciate class="seModerator.xml">
+    <set-attr-value name="name" value="moderator_0"/>
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="x" value="190.0"/>
+    <set-attr-value name="y" value="200.0"/>
+    <set-attr-value name="z" value="190.0"/>
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./Moderator.so"/>
+    <set-attr-value name="collision" value="false"/>
+    <set-attr-value name="graspable" value="false"/>
+  </instanciate>
+
+<!--Referee-->
+<!--
+  <instanciate class="seModerator.xml">
+    <set-attr-value name="name" value="referee"/>
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="x" value="200.0"/>
+    <set-attr-value name="y" value="200.0"/>
+    <set-attr-value name="z" value="190.0"/>
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./Referee.so"/>
+    <set-attr-value name="collision" value="false"/>
+    <set-attr-value name="graspable" value="false"/>
+  </instanciate>
+-->
+</world>
